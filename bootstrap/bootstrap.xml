@@ -1,0 +1,48 @@
+<project name="_bootstrap">
+	<extension-point name="bootstrap" depends="[bootstrap],[bootstrap-task]"/>
+	<extension-point name="[bootstrap]"/>
+	<extension-point name="[bootstrap-task]"/>
+	
+	<!--
+		Attempts to load a sequence of properties files. The property files are loaded from more specific to less specfic.
+		e.g.:
+		1) bootstrap.dev.local.properties
+		2) bootstrap.dev.properties
+		3) bootstrap.local.properties
+		4) bootstrap.properties
+		
+		Note: *.local.properties are reserved for computer-specific properties and MUST NOT be added into the source control system (e.g.: subversion, git).
+	-->
+	<macrodef name="_bootstrap_load_properties">
+		<attribute name="name"/>
+		<attribute name="basedir" default="${basedir}"/>
+		<sequential>
+			<property name="@{name}.env" value="dev"/>
+			<!-- Environment-specific properties-->
+			<property file="@{basedir}/@{name}.${@{name}.env}.local.properties"/>
+			<property file="@{basedir}/@{name}.${@{name}.env}.properties"/>
+			
+			<!-- Generic/Global properties-->
+			<property file="@{basedir}/@{name}.local.properties"/>
+			<property file="@{basedir}/@{name}.properties"/>
+		</sequential>
+	</macrodef>
+	
+	<!--
+		[Optional] System-wide properties. This properties are specific to a server/computer and loaded only when 'system.basedir' property is defined.
+	-->
+	<target name="_default_bootstrap_system" if="system.basedir" extensionOf="[bootstrap]">
+		<_bootstrap_load_properties name="system" basedir="${system.basedir}"/>
+	</target>
+	
+	<!--
+		Loads bootstrap properties.
+	-->
+	<target name="_default_bootstrap" extensionOf="[bootstrap]">
+		<property name="bootstrap.basedir" value="${basedir}"/> <!-- Default Value -->
+		<_bootstrap_load_properties name="bootstrap" basedir="${bootstrap.basedir}" />
+		
+		<!-- Default Properties -->
+		<property name="repo.central.url" value="http://repo1.maven.org/maven2"/>
+	</target>
+</project>
