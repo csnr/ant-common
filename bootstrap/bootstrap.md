@@ -3,6 +3,7 @@
 This extension-point is used in @depends for targets
 ## [bootstrap]
 This extension-point is responsible for loading bootstrap properties.
+
 Default  target: [_default_bootstrap](#_default_bootstrap)
 ## [bootstrap-task]
 This extension-point is responsible for loading ant tasks.
